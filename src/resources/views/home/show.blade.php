@@ -69,6 +69,74 @@
         </div>
     @endif
 
+    <!-- 评论区 -->
+    <div id="comments" class="mt-8">
+        <h3 class="font-bold text-gray-900 mb-4">评论 ({{ $article->comments->count() }})</h3>
+
+        @if(session('success'))
+            <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if($article->comments->count())
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-100 mb-6">
+                @foreach($article->comments as $comment)
+                    <div class="px-6 py-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="font-medium text-gray-900">{{ $comment->nickname }}</span>
+                            <span class="text-xs text-gray-400">{{ $comment->created_at->format('Y-m-d H:i') }}</span>
+                        </div>
+                        <p class="text-gray-700 text-sm leading-relaxed">{{ $comment->content }}</p>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-gray-500 text-sm mb-6">暂无评论，来抢沙发吧！</p>
+        @endif
+
+        <!-- 评论表单 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h4 class="font-medium text-gray-900 mb-4">发表评论</h4>
+            <form action="{{ route('comment.store', $article) }}" method="POST">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="nickname" class="block text-sm text-gray-600 mb-1">昵称 <span class="text-red-500">*</span></label>
+                        <input type="text" name="nickname" id="nickname" value="{{ old('nickname') }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent @error('nickname') border-red-500 @enderror"
+                               placeholder="你的昵称" required>
+                        @error('nickname')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm text-gray-600 mb-1">邮箱</label>
+                        <input type="email" name="email" id="email" value="{{ old('email') }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent @error('email') border-red-500 @enderror"
+                               placeholder="选填，不会公开">
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="content" class="block text-sm text-gray-600 mb-1">评论内容 <span class="text-red-500">*</span></label>
+                    <textarea name="content" id="content" rows="4"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent @error('content') border-red-500 @enderror"
+                              placeholder="说点什么..." required>{{ old('content') }}</textarea>
+                    @error('content')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <button type="submit"
+                        class="px-6 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition">
+                    提交评论
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- 返回按钮 -->
     <div class="mt-8">
         <a href="{{ route('home') }}" class="text-primary-600 hover:underline">

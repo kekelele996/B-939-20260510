@@ -49,6 +49,8 @@ class HomeController extends Controller
             abort(404);
         }
 
+        $article->load('comments');
+
         // 增加浏览次数
         $this->articleService->incrementViewCount($article);
 
