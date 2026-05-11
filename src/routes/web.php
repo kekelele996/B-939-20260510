@@ -7,8 +7,10 @@
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/article/{slug}', [HomeController::class, 'show'])->name('article.show');
+Route::post('/article/{article}/comment', [CommentController::class, 'store'])->name('comment.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -68,4 +71,8 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
         'update' => 'admin.tags.update',
         'destroy' => 'admin.tags.destroy',
     ]);
+
+    // 评论管理
+    Route::get('/comments', [AdminCommentController::class, 'index'])->name('admin.comments.index');
+    Route::delete('/comments/{comment}', [AdminCommentController::class, 'destroy'])->name('admin.comments.destroy');
 });
