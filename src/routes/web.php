@@ -7,8 +7,10 @@
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/article/{slug}', [HomeController::class, 'show'])->name('article.show');
+Route::post('/article/{slug}/comments', [CommentController::class, 'store'])->name('comments.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -68,4 +71,12 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
         'update' => 'admin.tags.update',
         'destroy' => 'admin.tags.destroy',
     ]);
+
+    // 评论管理
+    Route::prefix('comments')->name('admin.comments.')->group(function () {
+        Route::get('/', [AdminCommentController::class, 'index'])->name('index');
+        Route::delete('/{comment}', [AdminCommentController::class, 'destroy'])->name('destroy');
+        Route::post('/{comment}/approve', [AdminCommentController::class, 'approve'])->name('approve');
+        Route::post('/{comment}/pending', [AdminCommentController::class, 'pending'])->name('pending');
+    });
 });

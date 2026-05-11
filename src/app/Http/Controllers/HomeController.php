@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Services\ArticleService;
+use App\Services\CommentService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -15,7 +16,8 @@ use Illuminate\View\View;
 class HomeController extends Controller
 {
     public function __construct(
-        private readonly ArticleService $articleService
+        private readonly ArticleService $articleService,
+        private readonly CommentService $commentService
     ) {}
 
     /**
@@ -62,6 +64,8 @@ class HomeController extends Controller
                 ->get()
             : collect();
 
-        return view('home.show', compact('article', 'relatedArticles'));
+        $comments = $this->commentService->getArticleComments($article);
+
+        return view('home.show', compact('article', 'relatedArticles', 'comments'));
     }
 }
