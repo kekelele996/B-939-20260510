@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Services\ArticleService;
+use App\Services\CommentService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -15,7 +17,8 @@ use Illuminate\View\View;
 class HomeController extends Controller
 {
     public function __construct(
-        private readonly ArticleService $articleService
+        private readonly ArticleService $articleService,
+        private readonly CommentService $commentService
     ) {}
 
     /**
@@ -62,6 +65,37 @@ class HomeController extends Controller
                 ->get()
             : collect();
 
-        return view('home.show', compact('article', 'relatedArticles'));
+        // 获取已通过审核的评论
+        $comments = $this->commentService->getApprovedCommentsByArticle($article);
+
+        return view('home.show', compact('article', 'relatedArticles', 'comments'));
+    }
+
+    /**
+     * 提交评论
+     */
+    public function storeComment(Request $request, string $slug): RedirectResponse
+    {
+        $article = $this->articleService->getArticleBySlug($slug);
+
+        if (!$article) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'author_name' => 'required|string|max:50',
+            'author_email' => 'nullable|email|max:100',
+            'content' => 'required|string|max:2000',
+        ]);
+
+        $this->commentService->createComment(
+            article: $article,
+            data: $validated,
+            ipAddress: $request->ip()
+        );
+
+        return redirect()
+            ->route('article.show', $slug)
+            ->with('comment_success', '评论已提交，待审核后显示');
     }
 }

@@ -69,9 +69,98 @@
         </div>
     @endif
 
+    <!-- 评论区 -->
+    <div class="mt-12">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">
+            评论 ({{ $comments->count() }})
+        </h3>
+
+        @if(session('comment_success'))
+            <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                {{ session('comment_success') }}
+            </div>
+        @endif
+
+        <!-- 评论表单 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+            <h4 class="font-semibold text-gray-900 mb-4">发表评论</h4>
+            <form action="{{ route('article.comment.store', $article->slug) }}" method="POST">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            昵称 <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="author_name"
+                               required
+                               maxlength="50"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                               placeholder="请输入您的昵称">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            邮箱
+                        </label>
+                        <input type="email"
+                               name="author_email"
+                               maxlength="100"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                               placeholder="选填，不会公开">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        评论内容 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="content"
+                              required
+                              maxlength="2000"
+                              rows="4"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition resize-none"
+                              placeholder="请输入评论内容..."></textarea>
+                </div>
+                <button type="submit"
+                        class="px-6 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition font-medium">
+                    提交评论
+                </button>
+            </form>
+        </div>
+
+        <!-- 评论列表 -->
+        @if($comments->count())
+            <div class="space-y-6">
+                @foreach($comments as $comment)
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center font-semibold">
+                                    {{ mb_substr($comment->author_name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">{{ $comment->author_name }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ $comment->created_at->format('Y-m-d H:i') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-gray-700 pl-13">
+                            {{ $comment->content }}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+                <p class="text-gray-500">暂无评论，快来发表第一条评论吧！</p>
+            </div>
+        @endif
+    </div>
+
     <!-- 返回按钮 -->
     <div class="mt-8">
-        <a href="{{ route('home') }}" class="text-primary-600 hover:underline">
+        <a href="{{ route('home') }}" class="text-sky-600 hover:underline">
             ← 返回首页
         </a>
     </div>
